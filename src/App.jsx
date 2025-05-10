@@ -12,12 +12,25 @@ function Square({value, onSquareClick}) {
 }
 
 export default function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
   const [squares, setSquares] = useState(Array(9).fill(null));
 
   function handleClick(i) {
-    const nextSquares = squares.slice();
-    nextSquares[i] = "X";
+    if (squares[i]) {
+      return;
+    } // If the square is already filled, do nothing
+
+    const nextSquares = squares.slice(); // Create a copy of the squares array
+    
+    if (xIsNext) {
+      nextSquares[i] = "X";
+    } 
+    else {
+      nextSquares[i] = "O";
+    }
+    
     setSquares(nextSquares);
+    setXIsNext(!xIsNext);
   }
 
   return (
