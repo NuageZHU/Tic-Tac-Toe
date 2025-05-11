@@ -1,12 +1,47 @@
-# React + Vite
+# 🧠 Tic-Tac-Toe – Enhanced React Implementation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a responsive and interactive implementation of the classic Tic-Tac-Toe game using **React**. It includes key features such as dynamic board size selection, move history, and win/draw detection.
 
-Currently, two official plugins are available:
+Developed by **Zhu Kuangyun** from INSA Lyon as a front-end response for a technical stage application.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Preview
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 📌 Initial State
+
+![Initial Screen](./initial.png)
+
+### 🕹️ In-Game Example
+
+![In-Game](./ingame.png)
+
+---
+
+## 🚀 Features
+
+- ✅ **Two-player mode** with turn-based logic.
+- ✅ **Victory detection** with winning line highlight.
+- ✅ **Draw detection** when the board is full with no winner.
+- ✅ **Rematch button** after each game.
+- ✅ **Game history tracker** with move-by-move replay.
+- ✅ **Display winner and draw result** in game history.
+- ✅ **Custom board size support**: choose from 3×3, 4×4, 5×5 … up to 8×8.
+- ✅ **Responsive UI** with clear layout and improved visuals.
+- ✅ **Board scaling and styling** for different sizes.
+- ✅ **"Stats Tracking"** with full past results listed.
+
+---
+
+## 📦 Installation & Usage
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/NuageZHU/Tic-Tac-Toe.git
+cd your-repo-name
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the development server
+npm run dev
