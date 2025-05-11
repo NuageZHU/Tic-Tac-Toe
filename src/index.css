@@ -18,3 +18,8 @@
   content: '';
   display: table;
 }
+
+.winning-square {
+  background-color: #f7d56e;
+  color: black;
+}
