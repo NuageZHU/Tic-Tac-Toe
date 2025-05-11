@@ -110,7 +110,7 @@ export default function Game() {
     if (winner) {
       setGameResults([...gameResults, `${winner} won`]);
     } else if (isDraw(currentSquares)) {
-      setGameResults([...gameResults, "Draw"]);
+      setGameResults([...gameResults,"Draw"]);
     }
     setHistory([Array(9).fill(null)]);
     setCurrentMove(0);
@@ -131,22 +131,30 @@ export default function Game() {
   });
 
   return (
-    <div className="game">
-      <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-      </div>
-      <div className="game-info">
-        {(calculateWinner(currentSquares).winner || isDraw(currentSquares)) && (
-          <button onClick={handleRematch}>Rematch</button>
-        )}
-        <ol>{moves}</ol>
-        <div className="game-results">
-          <h3>Game History</h3>
-          <ul>
-            {gameResults.map((result, index) => (
-              <li key={index}>Game {index + 1}: {result}</li>
-            ))}
-          </ul>
+    <div className="game-container">
+      <header className="game-header">
+        <h1 className="game-title">Tic Tac Toe</h1>
+      </header>
+      <div className="game-content">
+        <div className="game-board">
+          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+          {(calculateWinner(currentSquares).winner || isDraw(currentSquares)) && (
+            <button onClick={handleRematch} className="rematch-button">Rematch</button>
+          )}
+        </div>
+        <div className="game-side">
+          <div className="game-moves">
+            <h3>Moves</h3>
+            <ol>{moves}</ol>
+          </div>
+          <div className="game-stats">
+            <h3>Stats Tracking</h3>
+            <ul>
+              {gameResults.map((result, index) => (
+                <li key={index}>Game {index + 1}: {result}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
