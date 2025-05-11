@@ -14,9 +14,9 @@ function Square({ value, onSquareClick, isWinningSquare }) {
   );
 }
 
-function Board({ xIsNext, squares, onPlay }) {
+function Board({ xIsNext, squares, onPlay, boardSize }) {
   function handleClick(i) {
-    if (squares[i] || calculateWinner(squares).winner) {
+    if (squares[i] || calculateWinner(squares, boardSize).winner) {
       return;
     } // If the square is already filled, do nothing
 
@@ -31,8 +31,8 @@ function Board({ xIsNext, squares, onPlay }) {
     onPlay(nextSquares);
   }
 
-  const { winner, winningSquares } = calculateWinner(squares);
-  const draw = isDraw(squares);
+  const { winner, winningSquares } = calculateWinner(squares, boardSize);
+  const draw = isDraw(squares, boardSize);
   let status;
   if (winner) {
     status = "Winner: " + winner;
@@ -42,56 +42,67 @@ function Board({ xIsNext, squares, onPlay }) {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
+  const rows = Array.from({ length: boardSize }, (_, rowIndex) => (
+    <div className="board-row" key={rowIndex}>
+      {Array.from({ length: boardSize }, (_, colIndex) => {
+        const index = rowIndex * boardSize + colIndex;
+        return (
+          <Square
+            key={index}
+            value={squares[index]}
+            onSquareClick={() => handleClick(index)}
+            isWinningSquare={winningSquares.includes(index)}
+          />
+        );
+      })}
+    </div>
+  ));
+
   return (
     <>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} isWinningSquare={winningSquares.includes(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} isWinningSquare={winningSquares.includes(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} isWinningSquare={winningSquares.includes(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} isWinningSquare={winningSquares.includes(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} isWinningSquare={winningSquares.includes(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} isWinningSquare={winningSquares.includes(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} isWinningSquare={winningSquares.includes(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} isWinningSquare={winningSquares.includes(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} isWinningSquare={winningSquares.includes(8)} />
-      </div>
+      <div className="status" style={{ width: '200px', textAlign: 'center' }}>{status}</div>
+      {rows}
     </>
   );
 }
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return { winner: squares[a], winningSquares: [a, b, c] };
+function calculateWinner(squares, boardSize) {
+  const lines = [];
+
+  // Rows
+  for (let row = 0; row < boardSize; row++) {
+    lines.push(Array.from({ length: boardSize }, (_, col) => row * boardSize + col));
+  }
+
+  // Columns
+  for (let col = 0; col < boardSize; col++) {
+    lines.push(Array.from({ length: boardSize }, (_, row) => row * boardSize + col));
+  }
+
+  // Diagonals
+  lines.push(Array.from({ length: boardSize }, (_, i) => i * (boardSize + 1))); // ↘️
+  lines.push(Array.from({ length: boardSize }, (_, i) => (i + 1) * (boardSize - 1))); // ↙️
+
+  for (const line of lines) {
+    const [first, ...rest] = line;
+    if (squares[first] && rest.every((index) => squares[index] === squares[first])) {
+      return { winner: squares[first], winningSquares: line };
     }
   }
+
   return { winner: null, winningSquares: [] };
 }
 
-function isDraw(squares) {
-  return squares.every(square => square !== null);
+function isDraw(squares, boardSize) {
+  const { winner } = calculateWinner(squares, boardSize);
+  return !winner && squares.every(square => square !== null);
 }
 
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [gameResults, setGameResults] = useState([]);
+  const [boardSize, setBoardSize] = useState(3);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
@@ -106,13 +117,19 @@ export default function Game() {
   }
 
   function handleRematch() {
-    const winner = calculateWinner(currentSquares).winner;
+    const winner = calculateWinner(currentSquares, boardSize).winner;
     if (winner) {
-      setGameResults([...gameResults, `${winner} won`]);
-    } else if (isDraw(currentSquares)) {
-      setGameResults([...gameResults,"Draw"]);
+      setGameResults([...gameResults, `(${boardSize}x${boardSize}): ${winner} won`]);
+    } else if (isDraw(currentSquares, boardSize)) {
+      setGameResults([...gameResults, `(${boardSize}x${boardSize}): Draw`]);
     }
-    setHistory([Array(9).fill(null)]);
+    setHistory([Array(boardSize * boardSize).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  function handleBoardSizeChange(size) {
+    setBoardSize(size);
+    setHistory([Array(size * size).fill(null)]);
     setCurrentMove(0);
   }
 
@@ -136,12 +153,33 @@ export default function Game() {
         <h1 className="game-title">Tic Tac Toe</h1>
       </header>
       <div className="game-content">
+        <div className="game-left">
+          <div className="board-options">
+            <div className="board-size-selector">
+              <label htmlFor="board-size">Select Board Size: </label>
+              <select
+                id="board-size"
+                value={boardSize}
+                onChange={(e) => handleBoardSizeChange(Number(e.target.value))}
+              >
+                <option value={3}>3x3</option>
+                <option value={4}>4x4</option>
+                <option value={5}>5x5</option>
+                <option value={6}>6x6</option>
+                <option value={7}>7x7</option>
+                <option value={8}>8x8</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div className="game-board">
-          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-          {(calculateWinner(currentSquares).winner || isDraw(currentSquares)) && (
+          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={boardSize} />
+          {(calculateWinner(currentSquares, boardSize).winner || isDraw(currentSquares, boardSize)) && (
             <button onClick={handleRematch} className="rematch-button">Rematch</button>
           )}
         </div>
+
         <div className="game-side">
           <div className="game-moves">
             <h3>Moves</h3>
@@ -155,6 +193,7 @@ export default function Game() {
               ))}
             </ul>
           </div>
+
         </div>
       </div>
     </div>
