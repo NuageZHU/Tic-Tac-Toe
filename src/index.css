@@ -75,16 +75,27 @@ body {
 .square {
   background: #fff;
   border: 1px solid #999;
-  float: left;
   font-size: calc(96px / 3 * var(--board-scale));
   font-weight: bold;
-  line-height: calc(120px / 3 * var(--board-scale));
-  height: calc(120px / 3 * var(--board-scale));
-  width: calc(120px / 3 * var(--board-scale));
+  line-height: 1;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
   text-align: center;
-  margin-right: -1px;
-  margin-top: -1px;
+  margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.board-grid {
+  width: min(90vw, 90vh, 480px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto 20px auto;
 }
 
 .rematch-button {

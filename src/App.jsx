@@ -18,16 +18,13 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares, boardSize).winner) {
       return;
-    } // If the square is already filled, do nothing
-
-    const nextSquares = squares.slice(); // Create a copy of the squares array
-    
+    }
+    const nextSquares = squares.slice();
     if (xIsNext) {
       nextSquares[i] = "X";
     } else {
       nextSquares[i] = "O";
     }
-    
     onPlay(nextSquares);
   }
 
@@ -42,26 +39,31 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
-  const rows = Array.from({ length: boardSize }, (_, rowIndex) => (
-    <div className="board-row" key={rowIndex}>
-      {Array.from({ length: boardSize }, (_, colIndex) => {
-        const index = rowIndex * boardSize + colIndex;
-        return (
+  return (
+    <>
+      <div className="status" style={{ width: '200px', textAlign: 'center' }}>{status}</div>
+      <div
+        className="board-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
+          gridTemplateRows: `repeat(${boardSize}, 1fr)`,
+          gap: '0',
+          width: 'min(90vw, 90vh, 480px)',
+          aspectRatio: '1',
+          maxWidth: '100%',
+          margin: '0 auto',
+        }}
+      >
+        {Array.from({ length: boardSize * boardSize }, (_, index) => (
           <Square
             key={index}
             value={squares[index]}
             onSquareClick={() => handleClick(index)}
             isWinningSquare={winningSquares.includes(index)}
           />
-        );
-      })}
-    </div>
-  ));
-
-  return (
-    <>
-      <div className="status" style={{ width: '200px', textAlign: 'center' }}>{status}</div>
-      {rows}
+        ))}
+      </div>
     </>
   );
 }
@@ -132,9 +134,14 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const [gameResults, setGameResults] = useState([]);
   const [boardSize, setBoardSize] = useState(3);
-  const [mode, setMode] = useState('pvp'); // 新增对战模式状态
+  const [mode, setMode] = useState('pvp');
+  const [pveFirst, setPveFirst] = useState('human'); // 新增PVE先后手
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+
+  // 记录当前对局先后手
+  const humanMark = mode === 'pve' ? (pveFirst === 'human' ? 'X' : 'O') : null;
+  const aiMark = mode === 'pve' ? (pveFirst === 'human' ? 'O' : 'X') : null;
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -148,11 +155,26 @@ export default function Game() {
 
   function handleRematch() {
     const winner = calculateWinner(currentSquares, boardSize).winner;
-    if (winner) {
-      setGameResults([...gameResults, `(${boardSize}x${boardSize}): ${winner} won`]);
-    } else if (isDraw(currentSquares, boardSize)) {
-      setGameResults([...gameResults, `(${boardSize}x${boardSize}): Draw`]);
+    let result = `(${mode.toUpperCase()}) ${boardSize}x${boardSize}`;
+    if (mode === 'pve') {
+      result += `, Human(${humanMark}) vs AI(${aiMark})`;
+      if (winner) {
+        if (winner === humanMark) {
+          result += `, Winner: Human(${winner})`;
+        } else {
+          result += `, Winner: AI(${winner})`;
+        }
+      } else if (isDraw(currentSquares, boardSize)) {
+        result += ', Draw';
+      }
+    } else {
+      if (winner) {
+        result += `, Winner: ${winner}`;
+      } else if (isDraw(currentSquares, boardSize)) {
+        result += ', Draw';
+      }
     }
+    setGameResults([...gameResults, result]);
     setHistory([Array(boardSize * boardSize).fill(null)]);
     setCurrentMove(0);
   }
@@ -169,6 +191,42 @@ export default function Game() {
     setCurrentMove(0);
   }
 
+  function handlePveFirstChange(e) {
+    setPveFirst(e.target.value);
+    setHistory([Array(boardSize * boardSize).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  // AI自动落子副作用
+  React.useEffect(() => {
+    if (mode === 'pve' && !calculateWinner(currentSquares, boardSize).winner && !isDraw(currentSquares, boardSize)) {
+      // 判断当前轮到谁
+      const aiTurn = (pveFirst === 'human' && !xIsNext) || (pveFirst === 'ai' && xIsNext);
+      if (aiTurn) {
+        const aiMove = getAIMove(currentSquares, boardSize, aiMark);
+        if (aiMove !== null) {
+          const nextSquares = currentSquares.slice();
+          nextSquares[aiMove] = aiMark;
+          handlePlay(nextSquares);
+        }
+      }
+    }
+  }, [mode, currentSquares, xIsNext, boardSize, pveFirst]);
+
+  // PVE且AI先手时，自动AI首落
+  React.useEffect(() => {
+    if (mode === 'pve' && pveFirst === 'ai' && history.length === 1 && history[0].every(sq => sq === null)) {
+      const aiMove = getAIMove(history[0], boardSize, aiMark);
+      if (aiMove !== null) {
+        const nextSquares = history[0].slice();
+        nextSquares[aiMove] = aiMark;
+        setHistory([history[0], nextSquares]);
+        setCurrentMove(1);
+      }
+    }
+    // eslint-disable-next-line
+  }, [mode, boardSize, pveFirst]);
+
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -182,21 +240,6 @@ export default function Game() {
       </li>
     );
   });
-
-  // AI自动落子副作用
-  React.useEffect(() => {
-    if (mode === 'pve' && !calculateWinner(currentSquares, boardSize).winner && !isDraw(currentSquares, boardSize)) {
-      // 轮到AI且AI为O（玩家总是X先手）
-      if (!xIsNext) {
-        const aiMove = getAIMove(currentSquares, boardSize, 'O');
-        if (aiMove !== null) {
-          const nextSquares = currentSquares.slice();
-          nextSquares[aiMove] = 'O';
-          handlePlay(nextSquares);
-        }
-      }
-    }
-  }, [mode, currentSquares, xIsNext, boardSize]);
 
   return (
     <div className="game-container">
@@ -228,6 +271,15 @@ export default function Game() {
                 <option value="pve">PVE (Player vs AI)</option>
               </select>
             </div>
+            {mode === 'pve' && (
+              <div className="pve-first-selector" style={{ marginTop: '10px' }}>
+                <label htmlFor="pve-first">First Move: </label>
+                <select id="pve-first" value={pveFirst} onChange={handlePveFirstChange}>
+                  <option value="human">Human First ({pveFirst === 'human' ? 'X' : 'O'})</option>
+                  <option value="ai">AI First ({pveFirst === 'ai' ? 'X' : 'O'})</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
 
