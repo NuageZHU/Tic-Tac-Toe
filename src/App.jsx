@@ -135,13 +135,16 @@ export default function Game() {
   const [gameResults, setGameResults] = useState([]);
   const [boardSize, setBoardSize] = useState(3);
   const [mode, setMode] = useState('pvp');
-  const [pveFirst, setPveFirst] = useState('human'); // 新增PVE先后手
+  const [pveFirst, setPveFirst] = useState('human');
+  const [pvpFirst, setPvpFirst] = useState('player1'); // 新增PVP先手
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
   // 记录当前对局先后手
   const humanMark = mode === 'pve' ? (pveFirst === 'human' ? 'X' : 'O') : null;
   const aiMark = mode === 'pve' ? (pveFirst === 'human' ? 'O' : 'X') : null;
+  const pvpFirstMark = pvpFirst === 'player1' ? 'X' : 'O';
+  const pvpSecondMark = pvpFirst === 'player1' ? 'O' : 'X';
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -168,8 +171,13 @@ export default function Game() {
         result += ', Draw';
       }
     } else {
+      result += `, Player1(${pvpFirstMark}) vs Player2(${pvpSecondMark})`;
       if (winner) {
-        result += `, Winner: ${winner}`;
+        if (winner === pvpFirstMark) {
+          result += `, Winner: Player1(${winner})`;
+        } else {
+          result += `, Winner: Player2(${winner})`;
+        }
       } else if (isDraw(currentSquares, boardSize)) {
         result += ', Draw';
       }
@@ -196,6 +204,33 @@ export default function Game() {
     setHistory([Array(boardSize * boardSize).fill(null)]);
     setCurrentMove(0);
   }
+
+  function handlePvpFirstChange(e) {
+    setPvpFirst(e.target.value);
+    setHistory([Array(boardSize * boardSize).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  // 统计胜率
+  const pvpStats = { total: 0, player1: 0, player2: 0, draw: 0 };
+  const pveStats = { total: 0, human: 0, ai: 0, draw: 0 };
+  gameResults.forEach(result => {
+    if (result.startsWith('(PVP')) {
+      pvpStats.total++;
+      if (result.includes('Winner: Player1')) pvpStats.player1++;
+      else if (result.includes('Winner: Player2')) pvpStats.player2++;
+      else if (result.includes('Draw')) pvpStats.draw++;
+    } else if (result.startsWith('(PVE')) {
+      pveStats.total++;
+      if (result.includes('Winner: Human')) pveStats.human++;
+      else if (result.includes('Winner: AI')) pveStats.ai++;
+      else if (result.includes('Draw')) pveStats.draw++;
+    }
+  });
+  pvpStats.winRate1 = pvpStats.total ? (pvpStats.player1 / pvpStats.total * 100).toFixed(1) : '0.0';
+  pvpStats.winRate2 = pvpStats.total ? (pvpStats.player2 / pvpStats.total * 100).toFixed(1) : '0.0';
+  pveStats.winRateHuman = pveStats.total ? (pveStats.human / pveStats.total * 100).toFixed(1) : '0.0';
+  pveStats.winRateAI = pveStats.total ? (pveStats.ai / pveStats.total * 100).toFixed(1) : '0.0';
 
   // AI自动落子副作用
   React.useEffect(() => {
@@ -246,64 +281,106 @@ export default function Game() {
       <header className="game-header">
         <h1 className="game-title">Tic Tac Toe</h1>
       </header>
-      <div className="game-content">
-        <div className="game-left">
-          <div className="board-options">
-            <div className="board-size-selector">
-              <label htmlFor="board-size">Select Board Size: </label>
-              <select
-                id="board-size"
-                value={boardSize}
-                onChange={(e) => handleBoardSizeChange(Number(e.target.value))}
-              >
-                <option value={3}>3x3</option>
-                <option value={4}>4x4</option>
-                <option value={5}>5x5</option>
-                <option value={6}>6x6</option>
-                <option value={7}>7x7</option>
-                <option value={8}>8x8</option>
-              </select>
-            </div>
-            <div className="mode-selector" style={{ marginTop: '10px' }}>
-              <label htmlFor="mode">Mode: </label>
-              <select id="mode" value={mode} onChange={handleModeChange}>
-                <option value="pvp">PVP (Player vs Player)</option>
-                <option value="pve">PVE (Player vs AI)</option>
-              </select>
-            </div>
-            {mode === 'pve' && (
-              <div className="pve-first-selector" style={{ marginTop: '10px' }}>
-                <label htmlFor="pve-first">First Move: </label>
-                <select id="pve-first" value={pveFirst} onChange={handlePveFirstChange}>
-                  <option value="human">Human First ({pveFirst === 'human' ? 'X' : 'O'})</option>
-                  <option value="ai">AI First ({pveFirst === 'ai' ? 'X' : 'O'})</option>
-                </select>
-              </div>
-            )}
+      {/* 上半部分：主游戏内容 */}
+      <div className="game-top">
+        <div className="game-settings">
+          <div className="board-size-selector">
+            <label htmlFor="board-size">Select Board Size: </label>
+            <select
+              id="board-size"
+              value={boardSize}
+              onChange={(e) => handleBoardSizeChange(Number(e.target.value))}
+            >
+              <option value={3}>3x3</option>
+              <option value={4}>4x4</option>
+              <option value={5}>5x5</option>
+              <option value={6}>6x6</option>
+              <option value={7}>7x7</option>
+              <option value={8}>8x8</option>
+            </select>
           </div>
+          <div className="mode-selector" style={{ marginTop: '10px' }}>
+            <label htmlFor="mode">Mode: </label>
+            <select id="mode" value={mode} onChange={handleModeChange}>
+              <option value="pvp">PVP (Player vs Player)</option>
+              <option value="pve">PVE (Player vs AI)</option>
+            </select>
+          </div>
+          {mode === 'pvp' && (
+            <div className="pvp-first-selector" style={{ marginTop: '10px' }}>
+              <label htmlFor="pvp-first">First Move: </label>
+              <select id="pvp-first" value={pvpFirst} onChange={handlePvpFirstChange}>
+                <option value="player1">Player1 (X)</option>
+                <option value="player2">Player2 (X)</option>
+              </select>
+            </div>
+          )}
+          {mode === 'pve' && (
+            <div className="pve-first-selector" style={{ marginTop: '10px' }}>
+              <label htmlFor="pve-first">First Move: </label>
+              <select id="pve-first" value={pveFirst} onChange={handlePveFirstChange}>
+                <option value="human">Human First ({pveFirst === 'human' ? 'X' : 'O'})</option>
+                <option value="ai">AI First ({pveFirst === 'ai' ? 'X' : 'O'})</option>
+              </select>
+            </div>
+          )}
         </div>
-
-        <div className="game-board">
+        <div className="game-board-area">
           <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={boardSize} />
           {(calculateWinner(currentSquares, boardSize).winner || isDraw(currentSquares, boardSize)) && (
             <button onClick={handleRematch} className="rematch-button">Rematch</button>
           )}
         </div>
-
-        <div className="game-side">
-          <div className="game-moves">
-            <h3>Moves</h3>
-            <ol>{moves}</ol>
-          </div>
-          <div className="game-stats">
-            <h3>Stats Tracking</h3>
-            <ul>
-              {gameResults.map((result, index) => (
-                <li key={index}>Game {index + 1}: {result}</li>
-              ))}
-            </ul>
-          </div>
-
+      </div>
+      {/* 下半部分：统计内容 */}
+      <div className="game-bottom">
+        <div className="game-stats-summary">
+          <h3 style={{ margin: '0 0 8px 0' }}>Win Rate Summary</h3>
+          <table style={{ width: '100%', fontSize: '0.95rem', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#f7e7b7' }}>
+                <th style={{ textAlign: 'left', padding: '2px 6px' }}>Mode</th>
+                <th>Games</th>
+                <th>Player1/Human</th>
+                <th>Player2/AI</th>
+                <th>Draw</th>
+                <th>Win Rate1/Human</th>
+                <th>Win Rate2/AI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>PVP</td>
+                <td>{pvpStats.total}</td>
+                <td>{pvpStats.player1}</td>
+                <td>{pvpStats.player2}</td>
+                <td>{pvpStats.draw}</td>
+                <td>{pvpStats.winRate1}%</td>
+                <td>{pvpStats.winRate2}%</td>
+              </tr>
+              <tr>
+                <td>PVE</td>
+                <td>{pveStats.total}</td>
+                <td>{pveStats.human}</td>
+                <td>{pveStats.ai}</td>
+                <td>{pveStats.draw}</td>
+                <td>{pveStats.winRateHuman}%</td>
+                <td>{pveStats.winRateAI}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="game-stats">
+          <h3>Stats Tracking</h3>
+          <ul>
+            {gameResults.map((result, index) => (
+              <li key={index}>Game {index + 1}: {result}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="game-moves">
+          <h3>Moves</h3>
+          <ol>{moves}</ol>
         </div>
       </div>
     </div>

@@ -74,7 +74,9 @@ body {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: none;
+  border-right: 1px solid #999;
+  border-bottom: 1px solid #999;
   font-size: calc(96px / 3 * var(--board-scale));
   font-weight: bold;
   line-height: 1;
@@ -89,13 +91,6 @@ body {
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-}
-
-.board-grid {
-  width: min(90vw, 90vh, 480px);
-  aspect-ratio: 1;
-  max-width: 100%;
-  margin: 0 auto 20px auto;
 }
 
 .rematch-button {
@@ -249,4 +244,131 @@ body[data-board-size="5"] {
 
 .board-options label {
   margin-bottom: 8px;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--board-size), 1fr);
+  grid-template-rows: repeat(var(--board-size), 1fr);
+  width: min(90vw, 90vh, 480px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto 20px auto;
+  background: #999;
+  /* 移除gap，保证格子无缝贴合 */
+  gap: 0;
+}
+
+/* 去除最右和最下的边框，保证外边框完整 */
+.board-grid > .square:nth-child(var(--board-size)n) {
+  border-right: none;
+}
+.board-grid > .square:nth-last-child(-n + var(--board-size)) {
+  border-bottom: none;
+}
+
+.game-top {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.game-settings,
+.game-board-area,
+.game-moves {
+  background-color: #fff8e1;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.game-settings {
+  flex: 1;
+  min-width: 180px;
+}
+
+.game-board-area {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-moves {
+  flex: 1;
+  min-width: 180px;
+  max-width: 240px;
+  height: 420px;
+  overflow-y: auto;
+}
+
+.game-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 20px;
+}
+
+.game-stats-summary,
+.game-stats {
+  background-color: #fff8e1;
+  border-radius: 8px;
+  padding: 16px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.game-stats-summary table {
+  width: 100%;
+  font-size: 0.98rem;
+  border-collapse: collapse;
+}
+
+.game-stats-summary th, .game-stats-summary td {
+  border-right: 1.5px solid #e0c97f;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.game-stats-summary th:last-child, .game-stats-summary td:last-child {
+  border-right: none;
+}
+
+@media (max-width: 1100px) {
+  .game-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .game-moves {
+    max-width: 100vw;
+    min-width: 120px;
+    width: 90vw;
+    height: 180px;
+  }
+}
+
+@media (max-width: 700px) {
+  .game-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+  }
+  .game-board-area, .game-settings, .game-moves {
+    margin: 0;
+    min-width: 0;
+    max-width: 100vw;
+    width: 98vw;
+  }
+  .game-bottom, .game-stats-summary, .game-stats {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 8px 2vw;
+  }
 }
