@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -98,11 +98,41 @@ function isDraw(squares, boardSize) {
   return !winner && squares.every(square => square !== null);
 }
 
+// AI 落子逻辑：优先取胜 > 阻挡对方 > 随机
+function getAIMove(squares, boardSize, aiMark) {
+  const opponentMark = aiMark === 'X' ? 'O' : 'X';
+  // 1. 检查AI是否能直接获胜
+  for (let i = 0; i < squares.length; i++) {
+    if (!squares[i]) {
+      const test = squares.slice();
+      test[i] = aiMark;
+      if (calculateWinner(test, boardSize).winner === aiMark) {
+        return i;
+      }
+    }
+  }
+  // 2. 检查是否需要阻挡对方获胜
+  for (let i = 0; i < squares.length; i++) {
+    if (!squares[i]) {
+      const test = squares.slice();
+      test[i] = opponentMark;
+      if (calculateWinner(test, boardSize).winner === opponentMark) {
+        return i;
+      }
+    }
+  }
+  // 3. 否则随机落子
+  const empty = squares.map((v, i) => v ? null : i).filter(i => i !== null);
+  if (empty.length === 0) return null;
+  return empty[Math.floor(Math.random() * empty.length)];
+}
+
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [gameResults, setGameResults] = useState([]);
   const [boardSize, setBoardSize] = useState(3);
+  const [mode, setMode] = useState('pvp'); // 新增对战模式状态
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
@@ -133,6 +163,12 @@ export default function Game() {
     setCurrentMove(0);
   }
 
+  function handleModeChange(e) {
+    setMode(e.target.value);
+    setHistory([Array(boardSize * boardSize).fill(null)]);
+    setCurrentMove(0);
+  }
+
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -146,6 +182,21 @@ export default function Game() {
       </li>
     );
   });
+
+  // AI自动落子副作用
+  React.useEffect(() => {
+    if (mode === 'pve' && !calculateWinner(currentSquares, boardSize).winner && !isDraw(currentSquares, boardSize)) {
+      // 轮到AI且AI为O（玩家总是X先手）
+      if (!xIsNext) {
+        const aiMove = getAIMove(currentSquares, boardSize, 'O');
+        if (aiMove !== null) {
+          const nextSquares = currentSquares.slice();
+          nextSquares[aiMove] = 'O';
+          handlePlay(nextSquares);
+        }
+      }
+    }
+  }, [mode, currentSquares, xIsNext, boardSize]);
 
   return (
     <div className="game-container">
@@ -168,6 +219,13 @@ export default function Game() {
                 <option value={6}>6x6</option>
                 <option value={7}>7x7</option>
                 <option value={8}>8x8</option>
+              </select>
+            </div>
+            <div className="mode-selector" style={{ marginTop: '10px' }}>
+              <label htmlFor="mode">Mode: </label>
+              <select id="mode" value={mode} onChange={handleModeChange}>
+                <option value="pvp">PVP (Player vs Player)</option>
+                <option value="pve">PVE (Player vs AI)</option>
               </select>
             </div>
           </div>
