@@ -284,10 +284,11 @@ export default function Game() {
       {/* 上半部分：主游戏内容 */}
       <div className="game-top">
         <div className="game-settings">
-          <div className="board-size-selector">
+          <div className="setting-group">
             <label htmlFor="board-size">Select Board Size: </label>
             <select
               id="board-size"
+              className="setting-select"
               value={boardSize}
               onChange={(e) => handleBoardSizeChange(Number(e.target.value))}
             >
@@ -299,26 +300,26 @@ export default function Game() {
               <option value={8}>8x8</option>
             </select>
           </div>
-          <div className="mode-selector" style={{ marginTop: '10px' }}>
+          <div className="setting-group">
             <label htmlFor="mode">Mode: </label>
-            <select id="mode" value={mode} onChange={handleModeChange}>
+            <select id="mode" className="setting-select" value={mode} onChange={handleModeChange}>
               <option value="pvp">PVP (Player vs Player)</option>
               <option value="pve">PVE (Player vs AI)</option>
             </select>
           </div>
           {mode === 'pvp' && (
-            <div className="pvp-first-selector" style={{ marginTop: '10px' }}>
+            <div className="setting-group">
               <label htmlFor="pvp-first">First Move: </label>
-              <select id="pvp-first" value={pvpFirst} onChange={handlePvpFirstChange}>
+              <select id="pvp-first" className="setting-select" value={pvpFirst} onChange={handlePvpFirstChange}>
                 <option value="player1">Player1 (X)</option>
                 <option value="player2">Player2 (X)</option>
               </select>
             </div>
           )}
           {mode === 'pve' && (
-            <div className="pve-first-selector" style={{ marginTop: '10px' }}>
+            <div className="setting-group">
               <label htmlFor="pve-first">First Move: </label>
-              <select id="pve-first" value={pveFirst} onChange={handlePveFirstChange}>
+              <select id="pve-first" className="setting-select" value={pveFirst} onChange={handlePveFirstChange}>
                 <option value="human">Human First ({pveFirst === 'human' ? 'X' : 'O'})</option>
                 <option value="ai">AI First ({pveFirst === 'ai' ? 'X' : 'O'})</option>
               </select>
