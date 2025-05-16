@@ -1,58 +1,69 @@
+// 设置面板 SettingsPanel：选择棋盘大小和对局模式
 import React from 'react';
+
+const labelStyle = {
+  fontSize: '1.05rem',
+  color: '#444',
+  marginBottom: '2px',
+  fontWeight: 500,
+};
+
+const selectStyle = {
+  fontSize: '1.08rem',
+  padding: '8px 12px',
+  borderRadius: '6px',
+  border: '1.5px solid #e0c97f',
+  background: '#fff',
+  color: '#333',
+  outline: 'none',
+  boxShadow: 'none',
+  minWidth: '120px',
+};
 
 function SettingsPanel({
   boardSize,
   mode,
-  pveFirst,
-  pvpFirst,
   handleBoardSizeChange,
-  handleModeChange,
-  handlePveFirstChange,
-  handlePvpFirstChange
+  handleModeChange
 }) {
   return (
-    <div className="game-settings">
-      <div className="setting-group">
-        <label htmlFor="board-size">Select Board Size: </label>
+    <div className="game-settings" style={{
+      flex: 1,
+      minWidth: '180px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '24px',
+      backgroundColor: '#fff8e1',
+      borderRadius: '8px',
+      padding: '24px 12px',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+    }}>
+      {/* 棋盘大小选择 */}
+      <div className="setting-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', width: '100%' }}>
+        <label htmlFor="board-size" style={labelStyle}>Board Size</label>
         <select
           id="board-size"
           className="setting-select"
+          style={selectStyle}
           value={boardSize}
           onChange={(e) => handleBoardSizeChange(Number(e.target.value))}
         >
-          <option value={3}>3x3</option>
-          <option value={4}>4x4</option>
-          <option value={5}>5x5</option>
-          <option value={6}>6x6</option>
-          <option value={7}>7x7</option>
-          <option value={8}>8x8</option>
+          {[3,4,5,6,7,8].map(size => (
+            <option key={size} value={size}>{size} x {size}</option>
+          ))}
         </select>
       </div>
-      <div className="setting-group">
-        <label htmlFor="mode">Mode: </label>
-        <select id="mode" className="setting-select" value={mode} onChange={handleModeChange}>
-          <option value="pvp">PVP (Player vs Player)</option>
-          <option value="pve">PVE (Player vs AI)</option>
+      {/* 对局模式选择 */}
+      <div className="setting-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', width: '100%' }}>
+        <label htmlFor="mode" style={labelStyle}>Game Mode</label>
+        <select id="mode" className="setting-select" style={selectStyle} value={mode} onChange={handleModeChange}>
+          <option value="pvp">PVP（Player vs Player）</option>
+          <option value="pve">PVE（Player vs AI）</option>
         </select>
       </div>
-      {mode === 'pvp' && (
-        <div className="setting-group">
-          <label htmlFor="pvp-first">First Move: </label>
-          <select id="pvp-first" className="setting-select" value={pvpFirst} onChange={handlePvpFirstChange}>
-            <option value="player1">Player1 (X)</option>
-            <option value="player2">Player2 (X)</option>
-          </select>
-        </div>
-      )}
-      {mode === 'pve' && (
-        <div className="setting-group">
-          <label htmlFor="pve-first">First Move: </label>
-          <select id="pve-first" className="setting-select" value={pveFirst} onChange={handlePveFirstChange}>
-            <option value="human">Human First ({pveFirst === 'human' ? 'X' : 'O'})</option>
-            <option value="ai">AI First ({pveFirst === 'ai' ? 'X' : 'O'})</option>
-          </select>
-        </div>
-      )}
+      {/* ConfigPage 不再渲染 FirstMoveSelector */}
     </div>
   );
 }

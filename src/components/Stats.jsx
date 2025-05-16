@@ -1,8 +1,10 @@
+// 统计面板 Stats：展示 PVP/PVE 总结、胜率、历史结果
 import React from 'react';
 
 function Stats({ pvpStats, pveStats, gameResults }) {
   return (
     <>
+      {/* 胜率统计表格 */}
       <div className="game-stats-summary">
         <h3 style={{ margin: '0 0 8px 0' }}>Win Rate Summary</h3>
         <table style={{ width: '100%', fontSize: '0.95rem', borderCollapse: 'collapse' }}>
@@ -39,6 +41,7 @@ function Stats({ pvpStats, pveStats, gameResults }) {
           </tbody>
         </table>
       </div>
+      {/* 历史对局结果列表 */}
       <div className="game-stats">
         <h3>Stats Tracking</h3>
         <ul>

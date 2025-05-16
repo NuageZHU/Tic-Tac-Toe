@@ -1,15 +1,25 @@
+// 游戏主逻辑 useGameLogic：管理棋盘、落子、AI、比分、历史等所有核心状态
 import { useState, useEffect, useCallback } from 'react';
 import { getAIMove } from '../utils/ai.jsx';
 import { computeStatsFromResults } from '../utils/statUtils.jsx';
+import { getGameData, setGameData } from '../utils/storage.jsx';
 
-export function useGameLogic() {
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const [currentMove, setCurrentMove] = useState(0);
-  const [gameResults, setGameResults] = useState([]);
-  const [boardSize, setBoardSize] = useState(3);
-  const [mode, setMode] = useState('pvp');
-  const [pveFirst, setPveFirst] = useState('human');
-  const [pvpFirst, setPvpFirst] = useState('player1');
+export function useGameLogic(initConfig) {
+  // 读取 localStorage 或外部传入的 config 初始化
+  const config = initConfig || (getGameData() && getGameData().config) || { mode: 'pvp', boardSize: 3, pveFirst: 'human', pvpFirst: 'player1' };
+  const [boardSize, setBoardSize] = useState(config.boardSize || 3);
+  const [mode, setMode] = useState(config.mode || 'pvp');
+  const [pveFirst, setPveFirst] = useState(config.pveFirst || 'human');
+  const [pvpFirst, setPvpFirst] = useState(config.pvpFirst || 'player1');
+  // 读取 localStorage 的 moves 初始化 history
+  const data = getGameData() || {};
+  const [history, setHistory] = useState(Array.isArray(data.moves) && data.moves.length > 0 ? data.moves : [Array((config.boardSize || 3) * (config.boardSize || 3)).fill(null)]);
+  const [currentMove, setCurrentMove] = useState((Array.isArray(data.moves) && data.moves.length > 0) ? data.moves.length - 1 : 0);
+  // 初始化 gameResults 为 localStorage 里的历史结果
+  const [gameResults, setGameResults] = useState(Array.isArray(data.results) ? data.results : []);
+
+  // 读取当前对局计分板
+  const currentScores = (getGameData() && getGameData().currentScores) || { pvp: { player1: 0, player2: 0, draw: 0 }, pve: { human: 0, ai: 0, draw: 0 } };
 
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
@@ -50,42 +60,65 @@ export function useGameLogic() {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    // --- 新增：每次落子都保存 moves 到 localStorage ---
+    setGameData({
+      ...getGameData(),
+      moves: nextHistory,
+    });
   }, [history, currentMove]);
 
   const jumpTo = useCallback((nextMove) => {
     setCurrentMove(nextMove);
-  }, []);
+    // --- 新增：每次跳转也保存 moves 到 localStorage ---
+    setGameData({
+      ...getGameData(),
+      moves: history,
+    });
+  }, [history]);
 
+  // handleRematch 时只更新 currentScores，不动历史
   const handleRematch = useCallback(() => {
     const winner = calculateWinner(currentSquares, boardSize).winner;
     let result = `(${mode.toUpperCase()}) ${boardSize}x${boardSize}`;
+    let newCurrentScores = { ...currentScores };
     if (mode === 'pve') {
       result += `, Human(${humanMark}) vs AI(${aiMark})`;
       if (winner) {
         if (winner === humanMark) {
           result += `, Winner: Human(${winner})`;
+          newCurrentScores.pve.human += 1;
         } else {
           result += `, Winner: AI(${winner})`;
+          newCurrentScores.pve.ai += 1;
         }
       } else if (isDraw(currentSquares, boardSize)) {
         result += ', Draw';
+        newCurrentScores.pve.draw += 1;
       }
     } else {
       result += `, Player1(${pvpFirstMark}) vs Player2(${pvpSecondMark})`;
       if (winner) {
         if (winner === pvpFirstMark) {
           result += `, Winner: Player1(${winner})`;
+          newCurrentScores.pvp.player1 += 1;
         } else {
           result += `, Winner: Player2(${winner})`;
+          newCurrentScores.pvp.player2 += 1;
         }
       } else if (isDraw(currentSquares, boardSize)) {
         result += ', Draw';
+        newCurrentScores.pvp.draw += 1;
       }
     }
     setGameResults(prev => [...prev, result]);
     setHistory([Array(boardSize * boardSize).fill(null)]);
     setCurrentMove(0);
-  }, [currentSquares, boardSize, mode, humanMark, aiMark, pvpFirstMark, pvpSecondMark, isDraw, calculateWinner]);
+    // 只更新 currentScores
+    setGameData({
+      ...getGameData(),
+      currentScores: newCurrentScores,
+    });
+  }, [currentSquares, boardSize, mode, humanMark, aiMark, pvpFirstMark, pvpSecondMark, isDraw, calculateWinner, currentScores]);
 
   const handleBoardSizeChange = useCallback((size) => {
     setBoardSize(size);
@@ -148,6 +181,19 @@ export function useGameLogic() {
   // 胜率统计
   const { pvpStats, pveStats } = computeStatsFromResults(gameResults);
 
+  // --- 新增副作用：对局结果持久化到 localStorage ---
+  // 只在 gameResults 变化时同步
+  useEffect(() => {
+    const data = getGameData() || {};
+    // 兼容新版 computeStatsFromResults 返回结构
+    const stats = computeStatsFromResults(gameResults);
+    setGameData({
+      ...data,
+      results: gameResults,
+      scores: stats.pvp && stats.pve ? { pvp: stats.pvp, pve: stats.pve } : (data.scores || {}),
+    });
+  }, [gameResults]);
+
   return {
     history,
     currentMove,
@@ -169,6 +215,7 @@ export function useGameLogic() {
     isDraw,
     moves,
     pvpStats,
-    pveStats
+    pveStats,
+    currentScores
   };
 }

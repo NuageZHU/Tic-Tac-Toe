@@ -1,3 +1,4 @@
+// 落子记录 Moves：显示每一步落子描述，可回溯
 import React from 'react';
 
 function Moves({ moves, jumpTo }) {

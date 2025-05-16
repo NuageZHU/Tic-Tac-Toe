@@ -1,5 +1,4 @@
-// 文件已重命名为 statUtils.jsx
-
+// 统计工具 statUtils：根据历史结果统计胜率和比分
 export function computeStatsFromResults(gameResults) {
   const pvpStats = { total: 0, player1: 0, player2: 0, draw: 0 };
   const pveStats = { total: 0, human: 0, ai: 0, draw: 0 };
@@ -20,5 +19,11 @@ export function computeStatsFromResults(gameResults) {
   pvpStats.winRate2 = pvpStats.total ? (pvpStats.player2 / pvpStats.total * 100).toFixed(1) : '0.0';
   pveStats.winRateHuman = pveStats.total ? (pveStats.human / pveStats.total * 100).toFixed(1) : '0.0';
   pveStats.winRateAI = pveStats.total ? (pveStats.ai / pveStats.total * 100).toFixed(1) : '0.0';
-  return { pvpStats, pveStats };
+  // 新增：返回原始分数对象，方便 useGameLogic 写入 localStorage
+  return {
+    pvp: { player1: pvpStats.player1, player2: pvpStats.player2, draw: pvpStats.draw },
+    pve: { human: pveStats.human, ai: pveStats.ai, draw: pveStats.draw },
+    pvpStats,
+    pveStats
+  };
 }
