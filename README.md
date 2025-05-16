@@ -1,80 +1,87 @@
-# 🧠 Tic-Tac-Toe – Enhanced React Implementation
+# 🧠 Tic-Tac-Toe – Enhanced React Implementation (v2.0)
 
-This project is a responsive and interactive implementation of the classic Tic-Tac-Toe game using **React**. It includes key features such as dynamic board size selection, move history, and win/draw detection.
-
-Developed by **Zhu Kuangyun** from INSA Lyon as a front-end response for a technical stage application.
-
----
-
-## 🚀 Preview
-
-### 📌 Initial State
-
-![Initial Screen](./initial.png)
-
-### 🕹️ In-Game Example
-
-![In-Game](./ingame.png)
+A fully interactive and persistent Tic-Tac-Toe game built with **React**.  
+This project was developed by **Zhu Kuangyun** (INSA Lyon), as part of a technical internship showcase.
 
 ---
 
-## ✨ Features
+## 🎮 Preview Screenshots
 
-### ✅ Existing Core Features
+| Home Page | Config Page |
+|-----------|-------------|
+| ![](./screens/home.png) | ![](./screens/config.png) |
 
-- **Two-player mode** with turn-based logic.
-- **Victory detection** with winning line highlight.
-- **Draw detection** when the board is full with no winner.
-- **Rematch button** for quick restarts.
-- **Game history tracker** with move-by-move replay.
-- **Custom board size support**: choose from 3×3, 4×4, 5×5 … up to 8×8.
-- **Responsive UI** with clear layout and improved visuals.
-- **Board scaling and styling** for different sizes.
-- **Statistics tracking** with full past results listed.
+| Game Page | History Page |
+|-----------|--------------|
+| ![](./screens/game.png) | ![](./screens/history.png) |
 
-### 🆕 May 15 Additions
+| In-Game Example | Win Rate Summary |
+|----------------|------------------|
+| ![](./screens/gameplay-pve.png) | ![](./screens/summary.png) |
 
-- **PVE Mode (Player vs AI)**: Added an AI opponent with local decision-making logic.
-- **First-Move Selection**: Users can choose who plays first in both PVP and PVE modes.
-- **Win Rate Summary Table**: Tracks wins/losses/draws and calculates win rates by mode and player.
-- **Grid-Based Board Layout**: Rebuilt using CSS Grid for clean, consistent layout at all board sizes.
-- **Enhanced UI Structure**: Settings, board, and history are now cleanly separated and responsive.
+---
+
+## ✨ Full Feature List
+
+### ✅ Core Features (v1.0)
+- Classic **PVP (Player vs Player)** mode.
+- **Victory detection** with line highlighting.
+- **Draw detection** when no moves left.
+- **Move history** with time-travel (go back to any step).
+- **Rematch button** to restart easily.
+- **Custom board size** from 3×3 to 8×8.
+- Responsive UI and board scaling.
+
+### 🆕 New in v2.0 (May 15–16, 2025)
+- ✅ **Multi-Page Routing** (`react-router-dom`)
+  - `/` Home | `/config` Config | `/game` Game | `/history` History
+- ✅ **PVE mode**: play against a basic AI
+- ✅ **First-move selection**: choose who plays first
+- ✅ **Scoreboard**: track wins/draws across one config
+- ✅ **Game history tracking**: stored and reviewed via History Page
+- ✅ **Win Rate Summary table**
+- ✅ **LocalStorage persistence**:
+  - Save config, ongoing game, scores and history
+  - Automatically restore after refresh
+- ✅ **Continue Game button**:
+  - Disabled if no progress; resumes current session if exists
+- ✅ **Clear History button**:
+  - Wipes all saved data from browser
 
 ---
 
 ## 🛠️ Development Process
 
-This project was built using an iterative, goal-driven approach: each feature was scoped, implemented, tested, and committed before moving on.
+This project evolved in **two major phases**:
 
-### 📌 Initial Development Steps
+### 🔹 Phase 1 – Core Build (v1.0)
+> Completed prior to May 11, 2025  
+- Game logic and UI built in a single component
+- Implemented win/draw detection and time-travel history
+- Introduced board resizing and basic styling
 
-1. Initial interactive board and basic game logic.
-2. Win detection and visual highlighting.
-3. Draw condition and reset mechanism.
-4. Move history with time-travel feature.
-5. Persistent statistics tracking.
-6. Dynamic board resizing logic.
-7. Responsive design and visual polish.
-
-### 🆕 May 15 Additions
-
-8. Added PVE mode with adjustable first-move settings.
-9. Developed basic AI logic (win > block > random).
-10. Created win rate summary table for mode/player tracking.
-11. Refactored board to use CSS Grid, preserving structure across sizes.
-12. Reorganized UI into clear left–center–right layout, with win/stats info below.
+### 🔸 Phase 2 – Full Refactor & Feature Expansion (v2.0)
+> Completed May 15–16, 2025 (overnight full refactor)  
+- Converted to multi-page architecture (SPA → MPA)
+- Broke down code into **Pages**, **Hooks**, **Utils** and **Components**
+- Added **AI opponent** with simple strategy
+- Introduced **state persistence** via LocalStorage
+- Created **cross-page data flow** using props/hooks
+- Refined UI for each view and added conditionally disabled buttons
 
 ---
 
-## 🔧 Tools & Technologies
+## 🧩 Tech Stack
 
-| Tool            | Purpose                              |
-|-----------------|--------------------------------------|
-| React + Vite    | Lightweight, fast front-end development |
-| VS Code         | Main development IDE                |
-| Git & GitHub    | Version control and collaboration   |
-| GitHub Copilot  | Code suggestions and boilerplate    |
-| ChatGPT         | Debugging and architecture assistance |
+| Tool              | Purpose                                |
+|-------------------|----------------------------------------|
+| React + Vite      | UI & SPA Framework                     |
+| React Router DOM  | Multi-page routing                     |
+| JavaScript (Hooks)| Logic, state management                |
+| localStorage API  | Persistent state saving                |
+| Git & GitHub      | Version control                        |
+| GitHub Copilot    | Code suggestions during development    |
+| ChatGPT           | Debugging, architecture and strategy   |
 
 > **Note**: Copilot and ChatGPT were used as development assistants, not replacements. All logic, structure, and integrations were independently planned and implemented.
 
@@ -100,9 +107,10 @@ npm run dev
 
 ---
 
-## 🤝 Contributing
+## 🧠 About the Developer
 
-Contributions are welcome! If you have suggestions or improvements, feel free to fork the repository and submit a pull request.
+**Zhu Kuangyun** – 4th year student, INSA Lyon (Telecom Department)
+This project was designed independently as a **personal front-end project**, integrating learning and practical coding for technical internship application.
 
 ---
 
