@@ -1,7 +1,9 @@
 # 🧠 Tic-Tac-Toe – Enhanced React Implementation (v2.0)
 
 A fully interactive and persistent Tic-Tac-Toe game built with **React**.  
-This project was developed by **Zhu Kuangyun** (INSA Lyon), as part of a technical internship showcase.
+This project demonstrates modern front-end development principles, including multi-page routing, state persistence, AI interaction, and responsive UI.
+
+Designed and developed by **Zhu Kuangyun**, a telecommunications engineering student at INSA Lyon, as part of a personal initiative to deepen front-end skills and showcase interactive UI design.
 
 ---
 
@@ -109,8 +111,8 @@ npm run dev
 
 ## 🧠 About the Developer
 
-**Zhu Kuangyun** – 4th year student, INSA Lyon (Telecom Department)
-This project was designed independently as a **personal front-end project**, integrating learning and practical coding for technical internship application.
+**Zhu Kuangyun** – 4th year engineering student, INSA Lyon (Telecommunications Department)  
+This project is part of my personal portfolio, demonstrating interactive front-end application development and component-based architecture using React.
 
 ---
 
