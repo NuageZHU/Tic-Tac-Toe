@@ -1,4 +1,4 @@
-// 历史页 HistoryPage：展示历史战绩、比分统计、清空历史、继续对局
+// HistoryPage.jsx —— 历史页，负责展示历史对局记录、比分统计，支持清空历史和继续未完成对局。
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Stats from '../components/Stats.jsx';

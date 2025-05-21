@@ -1,3 +1,4 @@
+// ai.jsx —— 井字棋 AI 算法工具，负责根据当前棋盘和棋子，自动计算 AI 的最佳落子位置，支持防守和进攻策略。
 // 文件已重命名为 ai.jsx
 
 export function getAIMove(squares, boardSize, aiMark) {

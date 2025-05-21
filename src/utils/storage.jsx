@@ -1,3 +1,4 @@
+// storage.jsx —— localStorage 工具，统一管理井字棋所有对局数据的读写、初始化、清空，保证数据持久化和恢复。
 // localStorage 工具：统一管理对局数据的读写、初始化、清空
 const STORAGE_KEY = 'tic-tac-toe-data';
 

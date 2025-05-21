@@ -1,3 +1,4 @@
+// statUtils.jsx —— 统计工具，负责根据历史对局结果统计 PVP/PVE 的胜负场次、胜率等数据，供统计面板和数据持久化使用。
 // 统计工具 statUtils：根据历史结果统计胜率和比分
 export function computeStatsFromResults(gameResults) {
   const pvpStats = { total: 0, player1: 0, player2: 0, draw: 0 };

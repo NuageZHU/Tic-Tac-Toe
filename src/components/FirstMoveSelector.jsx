@@ -1,3 +1,4 @@
+// FirstMoveSelector.jsx —— 先手选择器组件，负责在 PVP/PVE 模式下选择谁先手（玩家/AI），并同步到对局逻辑。
 // 先手选择器 FirstMoveSelector：选择 PVP/PVE 下谁先手
 import React from 'react';
 

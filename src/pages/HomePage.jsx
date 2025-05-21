@@ -1,4 +1,4 @@
-// 首页 HomePage：主入口，负责新开局、继续对局、查看历史的导航
+// HomePage.jsx —— 首页，作为主入口，负责新开局、继续对局和查看历史的导航。
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getGameData } from '../utils/storage.jsx';

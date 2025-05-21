@@ -1,3 +1,4 @@
+// GamePage.jsx —— 对局主页面，负责渲染棋盘、比分、落子记录、先后手选择等所有对局相关交互，支持本地持久化和多种模式。
 // 对局页 GamePage：主对局界面，包含棋盘、比分、落子记录、先后手选择等
 import React from 'react';
 import { Link } from 'react-router-dom';

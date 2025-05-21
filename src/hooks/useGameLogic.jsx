@@ -1,3 +1,4 @@
+// useGameLogic.jsx —— 井字棋核心业务逻辑自定义 Hook，负责管理棋盘状态、落子、AI、比分、历史、持久化等所有对局相关功能。
 // 游戏主逻辑 useGameLogic：管理棋盘、落子、AI、比分、历史等所有核心状态
 import { useState, useEffect, useCallback } from 'react';
 import { getAIMove } from '../utils/ai.jsx';

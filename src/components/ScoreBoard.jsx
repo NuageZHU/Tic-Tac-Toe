@@ -1,3 +1,4 @@
+// ScoreBoard.jsx —— 比分板组件，根据当前模式（PVP/PVE）展示双方和和棋的比分，风格统一，数据实时联动。
 // 比分板 ScoreBoard：根据模式显示当前比分（PVP/PVE）
 import React from 'react';
 

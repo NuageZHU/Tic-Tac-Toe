@@ -1,3 +1,4 @@
+// Stats.jsx —— 统计面板组件，负责展示 PVP/PVE 的胜负场次、胜率统计，以及历史对局结果列表。
 // 统计面板 Stats：展示 PVP/PVE 总结、胜率、历史结果
 import React from 'react';
 

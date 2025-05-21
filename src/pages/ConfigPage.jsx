@@ -1,3 +1,4 @@
+// ConfigPage.jsx —— 配置页，负责设置新对局的棋盘大小和模式，并支持继续上次未完成的对局。
 // 配置页 ConfigPage：负责新对局参数设置和继续旧对局
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

@@ -1,3 +1,4 @@
+// App.jsx —— 井字棋主组件，集成棋盘、设置、落子记录和统计，负责核心游戏逻辑与界面展示。
 import React from 'react';
 import Board from './components/Board';
 import Moves from './components/Moves';

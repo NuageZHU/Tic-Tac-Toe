@@ -1,3 +1,4 @@
+// SettingsPanel.jsx —— 设置面板组件，负责选择棋盘大小和对局模式（PVP/PVE），并将配置同步到外部。
 // 设置面板 SettingsPanel：选择棋盘大小和对局模式
 import React from 'react';
 

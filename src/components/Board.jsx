@@ -1,3 +1,4 @@
+// Board.jsx —— 棋盘组件，负责渲染棋盘、处理用户落子、显示当前状态（胜负/平局/下一步），支持任意棋盘大小。
 import React from 'react';
 
 function Board({ xIsNext, squares, onPlay, boardSize, calculateWinner, isDraw }) {
